@@ -796,19 +796,25 @@ def download(job_id, fmt):
 
 def _predownload_models():
     """
-    Background thread that downloads all Whisper model files to disk cache at
-    container startup. Models are loaded from disk when a user request arrives —
-    much faster than downloading from HuggingFace on demand (5-7 min cold start).
-    Each model is instantiated then immediately freed from memory; only the
-    ~/.cache/huggingface disk cache is kept.
+    Download Whisper model FILES to disk cache using snapshot_download —
+    no weights are loaded into RAM. This eliminates the HuggingFace download
+    delay on first user request (cold start) without consuming extra memory.
+    Downloads all 4 sizes sequentially so any model size is ready instantly.
     """
-    for size in ['tiny', 'base', 'small', 'medium']:
+    try:
+        from huggingface_hub import snapshot_download
+    except ImportError:
+        return  # huggingface_hub not available, skip
+
+    model_repos = {
+        'tiny':   'Systran/faster-whisper-tiny',
+        'base':   'Systran/faster-whisper-base',
+        'small':  'Systran/faster-whisper-small',
+        'medium': 'Systran/faster-whisper-medium',
+    }
+    for size, repo_id in model_repos.items():
         try:
-            m = WhisperModel(
-                size, device='cpu', compute_type='int8',
-                cpu_threads=1, num_workers=1,
-            )
-            del m   # free RAM, HuggingFace disk cache remains
+            snapshot_download(repo_id=repo_id, ignore_patterns=['*.msgpack', '*.h5'])
         except Exception:
             pass    # non-fatal — model will download on first user request
 
