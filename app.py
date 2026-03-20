@@ -806,13 +806,14 @@ def _predownload_models():
     except ImportError:
         return  # huggingface_hub not available, skip
 
-    model_repos = {
-        'tiny':   'Systran/faster-whisper-tiny',
-        'base':   'Systran/faster-whisper-base',
-        'small':  'Systran/faster-whisper-small',
-        'medium': 'Systran/faster-whisper-medium',
-    }
-    for size, repo_id in model_repos.items():
+    # Only pre-download tiny + base at startup — they're small enough (~78MB / ~148MB)
+    # to download safely without OOMing. small (~490MB) and medium (~1.5GB) are too
+    # large to buffer during download on Railway's constrained containers; they will
+    # download on first user request (expected: 3-8 min for small/medium cold start).
+    for repo_id in [
+        'Systran/faster-whisper-tiny',
+        'Systran/faster-whisper-base',
+    ]:
         try:
             snapshot_download(repo_id=repo_id, ignore_patterns=['*.msgpack', '*.h5'])
         except Exception:
