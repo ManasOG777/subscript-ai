@@ -25,17 +25,27 @@ os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
 jobs = {}
 _lock = threading.Lock()
 
-# Whisper model cache
-_model_cache = {}
+# Whisper model cache — only ONE model loaded at a time to conserve RAM
+# Caching all sizes simultaneously (tiny+base+small+medium) causes OOM on Railway
+_model_cache = {}   # {size: model}
+_current_model_size = None
 _model_lock = threading.Lock()
 
 
 def get_model(model_size):
+    global _current_model_size
     with _model_lock:
         if model_size not in _model_cache:
+            # Evict any previously loaded model to free RAM before loading new one
+            _model_cache.clear()
             _model_cache[model_size] = WhisperModel(
-                model_size, device='cpu', compute_type='int8'
+                model_size,
+                device='cpu',
+                compute_type='int8',
+                cpu_threads=2,    # limit CPU threads → lower peak RAM
+                num_workers=1,
             )
+            _current_model_size = model_size
         return _model_cache[model_size]
 
 
