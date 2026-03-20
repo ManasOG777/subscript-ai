@@ -395,7 +395,7 @@ def run_transcription(job_id, video_path, model_size, source_lang, original_name
         detected_lang = info.language
 
         # Collect segments — classify each segment
-        # Whisper may output Devanagari (hi), Roman Hinglish (hi romanized), or Latin (en)
+        # Whisper may output Devanagari, Urdu/Arabic, Roman Hinglish, or Latin
         segments = []
         for s in raw_segments:
             text = s.text.strip()
@@ -403,29 +403,30 @@ def run_transcription(job_id, video_path, model_size, source_lang, original_name
                 continue
 
             is_devanagari = any('\u0900' <= c <= '\u097F' for c in text)
-            # Whisper sometimes outputs Roman/Hinglish for Hindi audio
-            # Detect via detected_lang or explicit source_lang setting
+            # Urdu uses Arabic Unicode — treat as Hindi source
+            is_urdu = any('\u0600' <= c <= '\u06FF' for c in text)
+            # Roman/Hinglish: Whisper outputs Latin script for Hindi audio
             is_hindi_roman = (
-                not is_devanagari and
+                not is_devanagari and not is_urdu and
                 detected_lang == 'hi'
             )
 
             if is_devanagari:
-                # True Devanagari — native Hindi script
                 seg_type = 'devanagari'
+            elif is_urdu:
+                seg_type = 'urdu'        # treat like Devanagari, translate via auto
             elif is_hindi_roman:
-                # Whisper output Roman script for Hindi audio
                 seg_type = 'hindi_roman'
             else:
-                # English or other Latin-script source
                 seg_type = 'english'
 
             segments.append({
                 'start': round(s.start, 3),
                 'end': round(s.end, 3),
                 'text': text,
-                'text_en': '' if is_devanagari else text,
+                'text_en': '' if (is_devanagari or is_urdu) else text,
                 'text_hi': text if is_devanagari else '',
+                # Hinglish from Devanagari now; Roman/Urdu cases filled after translation
                 'text_hinglish': devanagari_to_hinglish(text) if is_devanagari else (text if is_hindi_roman else ''),
                 '_seg_type': seg_type,
             })
@@ -443,13 +444,14 @@ def run_transcription(job_id, video_path, model_size, source_lang, original_name
         })
 
         devanagari_idx = [i for i, s in enumerate(segments) if s['_seg_type'] == 'devanagari']
+        urdu_idx       = [i for i, s in enumerate(segments) if s['_seg_type'] == 'urdu']
         hindi_roman_idx = [i for i, s in enumerate(segments) if s['_seg_type'] == 'hindi_roman']
-        english_idx = [i for i, s in enumerate(segments) if s['_seg_type'] == 'english']
+        english_idx    = [i for i, s in enumerate(segments) if s['_seg_type'] == 'english']
 
         # Devanagari source → translate to English
         if devanagari_idx:
             update_job(job_id, {
-                'status': 'translating', 'progress': 65,
+                'status': 'translating', 'progress': 63,
                 'message': f'Translating Hindi (Devanagari) → English ({len(devanagari_idx)} segments)...'
             })
             hi2en = GoogleTranslator(source='hi', target='en')
@@ -458,8 +460,31 @@ def run_transcription(job_id, video_path, model_size, source_lang, original_name
             for idx, en_text in zip(devanagari_idx, en_results):
                 segments[idx]['text_en'] = en_text
 
+        # Urdu/Arabic source → translate to English, then English → Devanagari
+        if urdu_idx:
+            update_job(job_id, {
+                'status': 'translating', 'progress': 63,
+                'message': f'Translating Urdu/Hindi → English ({len(urdu_idx)} segments)...'
+            })
+            urdu2en = GoogleTranslator(source='auto', target='en')
+            ur_texts = [segments[i]['text'] for i in urdu_idx]
+            en_results = batch_translate_with_retry(ur_texts, urdu2en)
+            for idx, en_text in zip(urdu_idx, en_results):
+                segments[idx]['text_en'] = en_text
+
+            update_job(job_id, {
+                'status': 'translating', 'progress': 70,
+                'message': f'Translating English → Hindi Devanagari ({len(urdu_idx)} segments)...'
+            })
+            en2hi_u = GoogleTranslator(source='en', target='hi')
+            en_texts = [segments[i]['text_en'] for i in urdu_idx]
+            hi_results = batch_translate_with_retry(en_texts, en2hi_u)
+            for idx, hi_text in zip(urdu_idx, hi_results):
+                if any('\u0900' <= c <= '\u097F' for c in hi_text):
+                    segments[idx]['text_hi'] = hi_text
+
         # Hindi Roman (Hinglish) source:
-        # 1. Translate Hinglish → English (Google handles this well)
+        # 1. Translate Hinglish → English
         # 2. Translate English → Hindi Devanagari
         if hindi_roman_idx:
             update_job(job_id, {
@@ -472,20 +497,18 @@ def run_transcription(job_id, video_path, model_size, source_lang, original_name
             for idx, en_text in zip(hindi_roman_idx, en_results):
                 segments[idx]['text_en'] = en_text
 
-            # Now translate English → Hindi Devanagari
             update_job(job_id, {
                 'status': 'translating', 'progress': 72,
                 'message': f'Translating English → Hindi Devanagari ({len(hindi_roman_idx)} segments)...'
             })
-            en2hi = GoogleTranslator(source='en', target='hi')
+            en2hi_r = GoogleTranslator(source='en', target='hi')
             en_texts = [segments[i]['text_en'] for i in hindi_roman_idx]
-            hi_results = batch_translate_with_retry(en_texts, en2hi)
+            hi_results = batch_translate_with_retry(en_texts, en2hi_r)
             for idx, hi_text in zip(hindi_roman_idx, hi_results):
-                # Only update Devanagari if translation worked (contains Devanagari)
                 if any('\u0900' <= c <= '\u097F' for c in hi_text):
                     segments[idx]['text_hi'] = hi_text
-                    # Keep original Hinglish for hinglish track (more natural)
-                    # text_hinglish already set above
+                    # Regenerate Hinglish from Devanagari (clean, not Urdu/mixed)
+                    segments[idx]['text_hinglish'] = devanagari_to_hinglish(hi_text)
 
         # English/other source → translate to Hindi
         if english_idx:
@@ -499,6 +522,18 @@ def run_transcription(job_id, video_path, model_size, source_lang, original_name
             for idx, hi_text in zip(english_idx, hi_results):
                 segments[idx]['text_hi'] = hi_text
                 segments[idx]['text_hinglish'] = devanagari_to_hinglish(hi_text)
+
+        # Final pass: ensure all segments have Hinglish generated from Devanagari
+        # (covers Urdu source and any case where text_hinglish is empty or wrong script)
+        for s in segments:
+            hi = s.get('text_hi', '')
+            hinglish = s.get('text_hinglish', '')
+            needs_regen = (
+                not hinglish or
+                any('\u0600' <= c <= '\u06FF' for c in hinglish)  # Urdu chars in hinglish
+            )
+            if needs_regen and hi and any('\u0900' <= c <= '\u097F' for c in hi):
+                s['text_hinglish'] = devanagari_to_hinglish(hi)
 
         # Remove internal flag
         for s in segments:
