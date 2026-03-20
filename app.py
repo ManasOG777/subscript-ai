@@ -794,34 +794,8 @@ def download(job_id, fmt):
     )
 
 
-def _predownload_models():
-    """
-    Download Whisper model FILES to disk cache using snapshot_download —
-    no weights are loaded into RAM. This eliminates the HuggingFace download
-    delay on first user request (cold start) without consuming extra memory.
-    Downloads all 4 sizes sequentially so any model size is ready instantly.
-    """
-    try:
-        from huggingface_hub import snapshot_download
-    except ImportError:
-        return  # huggingface_hub not available, skip
-
-    # Only pre-download tiny + base at startup — they're small enough (~78MB / ~148MB)
-    # to download safely without OOMing. small (~490MB) and medium (~1.5GB) are too
-    # large to buffer during download on Railway's constrained containers; they will
-    # download on first user request (expected: 3-8 min for small/medium cold start).
-    for repo_id in [
-        'Systran/faster-whisper-tiny',
-        'Systran/faster-whisper-base',
-    ]:
-        try:
-            snapshot_download(repo_id=repo_id, ignore_patterns=['*.msgpack', '*.h5'])
-        except Exception:
-            pass    # non-fatal — model will download on first user request
-
-
-# Kick off pre-download immediately when the worker process starts
-threading.Thread(target=_predownload_models, daemon=True).start()
+# Models are pre-baked into the Docker image (see Dockerfile RUN snapshot_download).
+# No runtime download needed — WhisperModel loads from the image's HF disk cache.
 
 
 if __name__ == '__main__':
