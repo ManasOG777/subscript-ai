@@ -1,8 +1,8 @@
 [phases.setup]
-nixPkgs = ["python39", "ffmpeg"]
+nixPkgs = ["python39", "python39Packages.pip", "ffmpeg"]
 
 [phases.install]
-cmds = ["pip install -r requirements.txt"]
+cmds = ["python3.9 -m pip install -r requirements.txt"]
 
 [start]
-cmd = "gunicorn app:app --bind 0.0.0.0:$PORT --timeout 600 --workers 2 --threads 4"
+cmd = "python3.9 -m gunicorn app:app --bind 0.0.0.0:$PORT --timeout 600 --workers 2 --threads 4"
