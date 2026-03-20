@@ -2,8 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#080808"/>
 <title>SubScript — AI Video Transcription</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -15,56 +21,62 @@
   --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --mono:'JetBrains Mono','Fira Code','Courier New',monospace;
 }
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;line-height:1.6;overflow-x:hidden}
-
-/* Grid noise texture overlay */
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--font);
+  min-height:100vh;line-height:1.6;overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
 body::before{
   content:'';position:fixed;inset:0;
-  background-image:radial-gradient(ellipse 90% 55% at 50% -5%,rgba(255,255,255,.045) 0%,transparent 65%),
+  background-image:
+    radial-gradient(ellipse 90% 55% at 50% -5%,rgba(255,255,255,.045) 0%,transparent 65%),
     radial-gradient(ellipse 35% 28% at 85% 85%,rgba(255,255,255,.018) 0%,transparent 55%);
   pointer-events:none;z-index:0;
 }
-
-.wrap{max-width:880px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px;position:relative;z-index:1}
+@media(min-width:480px){.wrap{padding:0 22px}}
 
 /* ── HEADER ── */
-header{padding:44px 0 52px;text-align:center}
-.logo{display:inline-flex;align-items:center;gap:11px;margin-bottom:28px}
+header{padding:36px 0 44px;text-align:center}
+@media(min-width:480px){header{padding:44px 0 52px}}
+.logo{display:inline-flex;align-items:center;gap:11px;margin-bottom:24px}
 .logo-mark{
   width:42px;height:42px;background:var(--white);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .logo-mark svg{width:22px;height:22px}
 .logo-name{font-size:20px;font-weight:800;letter-spacing:-.4px;color:var(--white)}
 .logo-name em{color:var(--muted);font-style:normal;font-weight:400}
-
-h1{font-size:clamp(34px,6vw,60px);font-weight:900;letter-spacing:-2.5px;line-height:1.04;color:var(--white);margin-bottom:14px}
-.hero-sub{font-size:17px;color:var(--muted);max-width:480px;margin:0 auto 32px;font-weight:400}
-
-.chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:6px}
+h1{font-size:clamp(30px,6vw,60px);font-weight:900;letter-spacing:-2px;line-height:1.04;color:var(--white);margin-bottom:14px}
+.hero-sub{font-size:15px;color:var(--muted);max-width:480px;margin:0 auto 28px;font-weight:400}
+@media(min-width:480px){.hero-sub{font-size:17px}}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:6px}
 .chip{
   display:inline-flex;align-items:center;gap:5px;
-  padding:5px 13px;background:var(--s2);border:1px solid var(--border);
-  border-radius:100px;font-size:12px;color:var(--muted);font-weight:500;
+  padding:5px 12px;background:var(--s2);border:1px solid var(--border);
+  border-radius:100px;font-size:11px;color:var(--muted);font-weight:500;
 }
-.chip-dot{width:5px;height:5px;border-radius:50%;background:var(--white)}
+@media(min-width:480px){.chip{font-size:12px;padding:5px 13px}}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:var(--white);flex-shrink:0}
 
-/* ── CARD BASE ── */
+/* ── CARD ── */
 .card{
   background:var(--surface);border:1.5px solid var(--border);
-  border-radius:20px;padding:36px 38px;margin-bottom:22px;
+  border-radius:20px;padding:24px 20px;margin-bottom:18px;
   transition:border-color .2s;
 }
 .card:hover{border-color:#333}
+@media(min-width:480px){.card{padding:36px 38px;margin-bottom:22px}}
 
-/* ── UPLOAD ── */
+/* ── DROPZONE ── */
 .dropzone{
   border:2px dashed var(--border);border-radius:var(--r);
-  padding:52px 36px;text-align:center;cursor:pointer;
+  padding:42px 24px;text-align:center;cursor:pointer;
   transition:all .22s ease;position:relative;overflow:hidden;
+  -webkit-user-select:none;user-select:none;
 }
+@media(min-width:480px){.dropzone{padding:52px 36px}}
 .dropzone::after{
   content:'';position:absolute;inset:0;
   background:radial-gradient(ellipse at center,rgba(255,255,255,.025) 0%,transparent 70%);
@@ -73,16 +85,22 @@ h1{font-size:clamp(34px,6vw,60px);font-weight:900;letter-spacing:-2.5px;line-hei
 .dropzone:hover,.dropzone.over{border-color:var(--white);background:rgba(255,255,255,.018)}
 .dropzone:hover::after,.dropzone.over::after{opacity:1}
 .dropzone.filled{border-style:solid;border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.025)}
-
 .drop-icon{
   width:52px;height:52px;background:var(--s2);border:1px solid var(--border);
-  border-radius:13px;display:flex;align-items:center;justify-content:center;
-  margin:0 auto 18px;
+  border-radius:13px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
 }
 .drop-icon svg{width:26px;height:26px;color:var(--muted)}
 .drop-title{font-size:15px;font-weight:600;color:var(--white);margin-bottom:5px}
-.drop-hint{font-size:13px;color:var(--muted)}
+.drop-hint{font-size:12px;color:var(--muted);line-height:1.5}
 .drop-hint strong{color:var(--text);font-weight:500}
+/* iOS-friendly tap indicator */
+.browse-btn{
+  display:inline-block;margin-top:12px;padding:8px 18px;
+  background:var(--s2);border:1px solid var(--border);border-radius:8px;
+  font-size:13px;font-weight:600;color:var(--white);cursor:pointer;
+  font-family:var(--font);transition:all .18s;
+}
+.browse-btn:hover,.browse-btn:active{background:var(--s3);border-color:var(--bactive)}
 
 .file-row{display:flex;align-items:center;gap:14px;text-align:left}
 .file-row-icon{
@@ -94,9 +112,10 @@ h1{font-size:clamp(34px,6vw,60px);font-weight:900;letter-spacing:-2.5px;line-hei
 .file-row-meta{font-size:12px;color:var(--muted);margin-top:2px}
 .file-row-rm{
   background:none;border:none;cursor:pointer;color:var(--muted);
-  padding:6px;border-radius:6px;transition:color .2s,background .2s;flex-shrink:0;
+  padding:8px;border-radius:6px;transition:color .2s,background .2s;flex-shrink:0;
+  min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;
 }
-.file-row-rm:hover{color:var(--danger);background:rgba(255,68,85,.1)}
+.file-row-rm:hover,.file-row-rm:active{color:var(--danger);background:rgba(255,68,85,.1)}
 #fi{display:none}
 
 /* Multi file list */
@@ -108,7 +127,7 @@ h1{font-size:clamp(34px,6vw,60px);font-weight:900;letter-spacing:-2.5px;line-hei
 .files-list-item .badge{
   margin-left:auto;font-size:11px;padding:3px 9px;border-radius:100px;
   background:var(--s3);color:var(--muted);border:1px solid var(--border);
-  white-space:nowrap;
+  white-space:nowrap;flex-shrink:0;
 }
 
 /* GDrive row */
@@ -120,21 +139,22 @@ h1{font-size:clamp(34px,6vw,60px);font-weight:900;letter-spacing:-2.5px;line-hei
 .gdrive-input{
   flex:1;background:var(--s3);border:1px solid var(--border);border-radius:var(--rs);
   color:var(--text);font-size:13px;padding:10px 14px;font-family:var(--font);
-  transition:border-color .2s;outline:none;
+  transition:border-color .2s;outline:none;min-width:0;
+  -webkit-appearance:none;
 }
 .gdrive-input:focus{border-color:var(--bactive)}
 .gdrive-input::placeholder{color:var(--dim)}
 .gdrive-btn{
-  padding:10px 16px;background:var(--s3);border:1px solid var(--border);
+  padding:10px 14px;background:var(--s3);border:1px solid var(--border);
   border-radius:var(--rs);color:var(--muted);font-size:13px;font-weight:600;
   cursor:pointer;font-family:var(--font);white-space:nowrap;
-  transition:all .2s;flex-shrink:0;
+  transition:all .2s;flex-shrink:0;min-height:40px;
 }
-.gdrive-btn:hover{border-color:var(--bactive);color:var(--text)}
+.gdrive-btn:hover,.gdrive-btn:active{border-color:var(--bactive);color:var(--text)}
 
 /* Settings */
-.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
-@media(max-width:560px){.settings-grid{grid-template-columns:1fr}}
+.settings-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:20px}
+@media(min-width:480px){.settings-grid{grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}}
 .sg{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:15px 16px}
 .sg-label{
   font-size:10.5px;font-weight:700;letter-spacing:.85px;text-transform:uppercase;
@@ -143,10 +163,12 @@ h1{font-size:clamp(34px,6vw,60px);font-weight:900;letter-spacing:-2.5px;line-hei
 .sg-label svg{width:11px;height:11px}
 select{
   width:100%;background:var(--s3);border:1px solid var(--border);border-radius:var(--rs);
-  color:var(--text);font-size:13.5px;font-weight:500;padding:9px 34px 9px 13px;
-  appearance:none;cursor:pointer;font-family:var(--font);transition:border-color .2s;
+  color:var(--text);font-size:14px;font-weight:500;padding:10px 34px 10px 13px;
+  -webkit-appearance:none;appearance:none;cursor:pointer;font-family:var(--font);
+  transition:border-color .2s;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 11px center;
+  min-height:42px;
 }
 select:focus{outline:none;border-color:var(--bactive)}
 .sg-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
@@ -161,21 +183,23 @@ select:focus{outline:none;border-color:var(--bactive)}
 .btn-primary{
   width:100%;padding:15px 28px;background:var(--white);color:var(--bg);
   border:none;border-radius:var(--r);font-size:14.5px;font-weight:700;
-  cursor:pointer;margin-top:22px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;margin-top:20px;display:flex;align-items:center;justify-content:center;
   gap:9px;letter-spacing:-.2px;font-family:var(--font);
   transition:transform .18s,box-shadow .18s,opacity .18s;position:relative;overflow:hidden;
+  min-height:52px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 .btn-primary::before{
   content:'';position:absolute;inset:0;
   background:linear-gradient(135deg,transparent,rgba(0,0,0,.07));opacity:0;transition:opacity .2s;
 }
 .btn-primary:hover:not(:disabled)::before{opacity:1}
-.btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 28px rgba(255,255,255,.13)}
-.btn-primary:active:not(:disabled){transform:translateY(0)}
+.btn-primary:hover:not(:disabled),.btn-primary:active:not(:disabled){
+  transform:translateY(-1px);box-shadow:0 8px 28px rgba(255,255,255,.13);
+}
 .btn-primary:disabled{opacity:.35;cursor:not-allowed}
-.btn-primary svg{width:19px;height:19px}
+.btn-primary svg{width:19px;height:19px;flex-shrink:0}
 
-/* ── QUEUE LIST (multi-job) ── */
+/* ── QUEUE ── */
 .queue-card{display:none}
 .queue-card.visible{display:block}
 .queue-title{
@@ -184,16 +208,18 @@ select:focus{outline:none;border-color:var(--bactive)}
 }
 .queue-title::after{content:'';flex:1;height:1px;background:var(--border)}
 .job-item{
-  display:flex;align-items:center;gap:14px;padding:16px 18px;
+  display:flex;align-items:center;gap:12px;padding:14px 16px;
   background:var(--s2);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;
   transition:border-color .2s;
 }
+@media(min-width:480px){.job-item{gap:14px;padding:16px 18px}}
 .job-item.done{border-color:rgba(57,232,124,.25);background:rgba(57,232,124,.03)}
 .job-item.error{border-color:rgba(255,68,85,.25);background:rgba(255,68,85,.03)}
 .job-icon{
-  width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;
   flex-shrink:0;background:var(--s3);border:1px solid var(--border);
 }
+@media(min-width:480px){.job-icon{width:40px;height:40px}}
 .job-icon svg{width:18px;height:18px}
 .job-info{flex:1;min-width:0}
 .job-name{font-size:13px;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -204,29 +230,30 @@ select:focus{outline:none;border-color:var(--bactive)}
 .job-item.done .job-bar-fill{background:var(--success)}
 .job-item.error .job-bar-fill{background:var(--danger)}
 .job-pct{font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:4px}
-.job-dl{
-  display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;
-}
+.job-dl{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .job-dl a{
   font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;
   border:1px solid var(--border);color:var(--muted);text-decoration:none;
   background:var(--s3);transition:all .15s;
 }
-.job-dl a:hover{border-color:var(--bactive);color:var(--text)}
+.job-dl a:hover,.job-dl a:active{border-color:var(--bactive);color:var(--text)}
 .job-actions{flex-shrink:0}
 .job-view-btn{
-  padding:7px 14px;background:var(--s3);border:1px solid var(--border);
+  padding:7px 12px;background:var(--s3);border:1px solid var(--border);
   border-radius:var(--rs);font-size:12px;font-weight:600;color:var(--muted);
-  cursor:pointer;font-family:var(--font);transition:all .2s;
+  cursor:pointer;font-family:var(--font);transition:all .2s;white-space:nowrap;
+  touch-action:manipulation;
 }
-.job-view-btn:hover{border-color:var(--bactive);color:var(--text)}
+.job-view-btn:hover,.job-view-btn:active{border-color:var(--bactive);color:var(--text)}
 .job-view-btn.active{background:var(--white);color:var(--bg);border-color:var(--white)}
 
-/* ── PROGRESS (single) ── */
+/* ── PROGRESS ── */
 .progress-card{display:none}
 .progress-card.visible{display:block}
-.prog-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
-.prog-title{font-size:18px;font-weight:700;color:var(--white)}
+.prog-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+@media(min-width:480px){.prog-head{margin-bottom:22px}}
+.prog-title{font-size:17px;font-weight:700;color:var(--white)}
+@media(min-width:480px){.prog-title{font-size:18px}}
 .prog-badge{
   display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
   padding:4px 12px;border-radius:100px;background:var(--s2);
@@ -239,8 +266,9 @@ select:focus{outline:none;border-color:var(--bactive)}
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.steps{display:flex;gap:0;margin-bottom:18px}
-.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;position:relative}
+/* Steps — responsive */
+.steps{display:flex;gap:0;margin-bottom:18px;overflow:hidden}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;min-width:0}
 .step::before{
   content:'';position:absolute;top:13px;left:50%;right:-50%;
   height:1px;background:var(--border);z-index:0;
@@ -249,11 +277,12 @@ select:focus{outline:none;border-color:var(--bactive)}
 .step-dot{
   width:26px;height:26px;border-radius:50%;background:var(--s2);
   border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;
-  z-index:1;transition:all .3s;font-size:10.5px;color:var(--dim);font-weight:700;
+  z-index:1;transition:all .3s;font-size:10.5px;color:var(--dim);font-weight:700;flex-shrink:0;
 }
 .step.active .step-dot{border-color:var(--white);background:var(--white);color:var(--bg)}
 .step.done .step-dot{border-color:var(--success);background:rgba(57,232,124,.12);color:var(--success)}
-.step-lbl{font-size:9.5px;color:var(--dim);font-weight:500;text-align:center;letter-spacing:.2px}
+.step-lbl{font-size:8.5px;color:var(--dim);font-weight:500;text-align:center;letter-spacing:.2px;white-space:nowrap}
+@media(min-width:400px){.step-lbl{font-size:9.5px}}
 .step.active .step-lbl{color:var(--muted)}
 .step.done .step-lbl{color:var(--success)}
 
@@ -264,40 +293,46 @@ select:focus{outline:none;border-color:var(--bactive)}
 /* ── ERROR ── */
 .err-card{
   background:rgba(255,68,85,.04);border:1.5px solid rgba(255,68,85,.25);
-  border-radius:16px;padding:22px 24px;margin-bottom:22px;
-  display:none;align-items:flex-start;gap:14px;
+  border-radius:16px;padding:20px;margin-bottom:18px;
+  display:none;align-items:flex-start;gap:12px;
 }
+@media(min-width:480px){.err-card{padding:22px 24px;gap:14px;margin-bottom:22px}}
 .err-card.visible{display:flex}
 .err-icon{
   width:38px;height:38px;background:rgba(255,68,85,.1);border-radius:10px;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .err-title{font-size:14px;font-weight:700;color:var(--danger);margin-bottom:4px}
-.err-msg{font-size:12.5px;color:var(--muted)}
+.err-msg{font-size:12.5px;color:var(--muted);line-height:1.5}
 .btn-retry{
-  margin-top:10px;padding:7px 14px;background:none;
+  margin-top:10px;padding:8px 16px;background:none;
   border:1px solid rgba(255,68,85,.4);border-radius:7px;color:var(--danger);
   font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .2s;
+  touch-action:manipulation;min-height:36px;
 }
-.btn-retry:hover{background:rgba(255,68,85,.08)}
+.btn-retry:hover,.btn-retry:active{background:rgba(255,68,85,.08)}
 
 /* ── RESULTS ── */
 .results-card{display:none}
 .results-card.visible{display:block}
-.res-head{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.res-head{display:flex;align-items:center;gap:12px;margin-bottom:22px}
 .res-icon{
   width:42px;height:42px;background:rgba(57,232,124,.1);
   border:1px solid rgba(57,232,124,.28);border-radius:10px;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.res-title{font-size:19px;font-weight:700;color:var(--white)}
+.res-title{font-size:18px;font-weight:700;color:var(--white)}
+@media(min-width:480px){.res-title{font-size:19px}}
 .res-sub{font-size:12px;color:var(--muted);margin-top:2px}
 
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:24px}
-@media(max-width:440px){.stats{grid-template-columns:1fr 1fr}}
-.stat{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:15px;text-align:center}
-.stat-val{font-size:21px;font-weight:900;color:var(--white);letter-spacing:-1px;font-family:var(--mono)}
-.stat-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-top:3px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+@media(min-width:480px){.stats{gap:11px;margin-bottom:24px}}
+@media(max-width:360px){.stats{grid-template-columns:1fr 1fr}}
+.stat{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:13px;text-align:center}
+@media(min-width:480px){.stat{padding:15px}}
+.stat-val{font-size:19px;font-weight:900;color:var(--white);letter-spacing:-1px;font-family:var(--mono)}
+@media(min-width:480px){.stat-val{font-size:21px}}
+.stat-lbl{font-size:9.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-top:3px}
 
 .sec-title{
   font-size:10.5px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;
@@ -305,15 +340,15 @@ select:focus{outline:none;border-color:var(--bactive)}
 }
 .sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
 
-.dl-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:22px}
-@media(max-width:480px){.dl-grid{grid-template-columns:1fr}}
+.dl-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:20px}
+@media(min-width:420px){.dl-grid{grid-template-columns:1fr 1fr;gap:9px;margin-bottom:22px}}
 .dl-btn{
   display:flex;align-items:center;gap:12px;padding:13px 15px;
   background:var(--s2);border:1px solid var(--border);border-radius:var(--r);
   cursor:pointer;text-decoration:none;transition:all .18s ease;color:var(--text);
-  font-family:var(--font);
+  font-family:var(--font);touch-action:manipulation;
 }
-.dl-btn:hover{border-color:var(--bactive);background:var(--s3);transform:translateY(-1px)}
+.dl-btn:hover,.dl-btn:active{border-color:var(--bactive);background:var(--s3);transform:translateY(-1px)}
 .dl-badge{
   width:34px;height:34px;border-radius:7px;display:flex;align-items:center;
   justify-content:center;flex-shrink:0;font-size:10.5px;font-weight:800;letter-spacing:.2px;
@@ -321,34 +356,37 @@ select:focus{outline:none;border-color:var(--bactive)}
 .en-badge{background:rgba(255,255,255,.07);color:var(--white)}
 .hi-badge{background:rgba(255,165,0,.1);color:#ffaa44}
 .bi-badge{background:rgba(100,160,255,.1);color:#77aaff}
+.hl-badge{background:rgba(100,220,140,.1);color:#55dd88}
 .txt-badge{background:rgba(160,110,255,.1);color:#bb99ff}
 .dl-info{flex:1;min-width:0}
 .dl-name{font-size:12.5px;font-weight:600;color:var(--white)}
 .dl-desc{font-size:11px;color:var(--muted);margin-top:1px}
 .dl-arrow{color:var(--dim);transition:transform .18s;flex-shrink:0}
-.dl-btn:hover .dl-arrow{transform:translateX(2px);color:var(--muted)}
+.dl-btn:hover .dl-arrow,.dl-btn:active .dl-arrow{transform:translateX(2px);color:var(--muted)}
 
-/* Preview */
+/* ── PREVIEW ── */
 .preview-box{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.tabs{display:flex;border-bottom:1px solid var(--border)}
+.tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
 .tab{
-  padding:11px 18px;font-size:12.5px;font-weight:600;color:var(--muted);
+  padding:11px 16px;font-size:12.5px;font-weight:600;color:var(--muted);
   cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
   transition:all .18s;background:none;border-top:none;border-left:none;border-right:none;
-  font-family:var(--font);
+  font-family:var(--font);white-space:nowrap;touch-action:manipulation;flex-shrink:0;
 }
 .tab.active{color:var(--white);border-bottom-color:var(--white)}
 .tab:hover:not(.active){color:var(--text)}
 .tab-pane{display:none}
 .tab-pane.active{display:block}
-.seg-list{max-height:300px;overflow-y:auto;padding:4px}
+.seg-list{max-height:280px;overflow-y:auto;padding:4px;-webkit-overflow-scrolling:touch}
+@media(min-width:480px){.seg-list{max-height:300px}}
 .seg-list::-webkit-scrollbar{width:3px}
 .seg-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .seg{display:flex;gap:12px;padding:11px 15px;border-radius:8px;transition:background .15s}
-.seg:hover{background:var(--s3)}
+.seg:hover,.seg:active{background:var(--s3)}
 .seg-ts{
   font-size:10.5px;font-family:var(--mono);color:var(--dim);
-  padding-top:3px;flex-shrink:0;width:48px;
+  padding-top:3px;flex-shrink:0;width:44px;
 }
 .seg-body{flex:1;min-width:0}
 .seg-en{font-size:13px;color:var(--text);line-height:1.5}
@@ -358,17 +396,19 @@ select:focus{outline:none;border-color:var(--bactive)}
   width:100%;padding:12px 22px;background:none;border:1.5px solid var(--border);
   border-radius:var(--r);color:var(--muted);font-size:13.5px;font-weight:600;
   cursor:pointer;margin-top:18px;display:flex;align-items:center;justify-content:center;
-  gap:7px;transition:all .18s;font-family:var(--font);
+  gap:7px;transition:all .18s;font-family:var(--font);min-height:48px;
+  touch-action:manipulation;
 }
-.btn-new:hover{border-color:var(--bactive);color:var(--text)}
+.btn-new:hover,.btn-new:active{border-color:var(--bactive);color:var(--text)}
 
-/* Features */
-.features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:56px}
-@media(max-width:640px){.features{grid-template-columns:1fr}}
+/* ── FEATURES ── */
+.features{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:44px}
+@media(min-width:480px){.features{grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:56px}}
 .feat{
   background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:22px;transition:border-color .2s;
+  padding:20px;transition:border-color .2s;
 }
+@media(min-width:480px){.feat{padding:22px}}
 .feat:hover{border-color:#333}
 .feat-icon{
   width:38px;height:38px;background:var(--s2);border:1px solid var(--border);
@@ -378,7 +418,8 @@ select:focus{outline:none;border-color:var(--bactive)}
 .feat-title{font-size:13.5px;font-weight:700;color:var(--white);margin-bottom:5px}
 .feat-desc{font-size:12.5px;color:var(--muted);line-height:1.55}
 
-footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color:var(--dim);font-size:12px}
+footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;color:var(--dim);font-size:12px}
+@media(min-width:480px){footer{padding:28px 0}}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .38s ease forwards}
@@ -398,10 +439,10 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
     <span class="logo-name">Sub<em>Script</em></span>
   </div>
   <h1>AI Video<br>Transcription</h1>
-  <p class="hero-sub">Turn any video into accurate English &amp; Hindi subtitles using OpenAI Whisper.</p>
+  <p class="hero-sub">Turn any video into accurate English, Hindi &amp; Hinglish subtitles using OpenAI Whisper.</p>
   <div class="chips">
     <span class="chip"><span class="chip-dot"></span>OpenAI Whisper</span>
-    <span class="chip"><span class="chip-dot"></span>English + हिंदी</span>
+    <span class="chip"><span class="chip-dot"></span>English + हिंदी + Hinglish</span>
     <span class="chip"><span class="chip-dot"></span>SRT · VTT · TXT</span>
     <span class="chip"><span class="chip-dot"></span>Google Drive</span>
     <span class="chip"><span class="chip-dot"></span>Multi-Video Queue</span>
@@ -421,8 +462,9 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
           <line x1="12" y1="3" x2="12" y2="15"/>
         </svg>
       </div>
-      <p class="drop-title">Drop videos here or <strong onclick="document.getElementById('fi').click()" style="cursor:pointer;text-decoration:underline;color:#fff">browse files</strong></p>
-      <p class="drop-hint">MP4 · MOV · AVI · MKV · WebM · up to 4 GB · multiple files supported</p>
+      <p class="drop-title">Drop videos here or browse files</p>
+      <p class="drop-hint">MP4 · MOV · AVI · MKV · WebM · M4V · up to 4 GB<br>Multiple files supported</p>
+      <button class="browse-btn" id="browseBtn" type="button">Choose Video</button>
     </div>
     <div id="dzFilled" style="display:none">
       <div class="file-row">
@@ -435,7 +477,7 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
           <div class="file-row-name" id="fn1"></div>
           <div class="file-row-meta" id="fm1"></div>
         </div>
-        <button class="file-row-rm" id="removeFile1" title="Remove">
+        <button class="file-row-rm" id="removeFile1" type="button" title="Remove">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
@@ -443,9 +485,12 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
       </div>
     </div>
   </div>
-  <input type="file" id="fi" accept="video/*,.mkv" multiple/>
+  <!-- Hidden file input — accepts all video formats including iOS QuickTime -->
+  <input type="file" id="fi"
+    accept="video/*,video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,video/webm,video/x-m4v,.mp4,.mov,.avi,.mkv,.webm,.m4v,.3gp,.ts,.mts"
+    multiple/>
 
-  <!-- Additional files list (when multiple selected) -->
+  <!-- Additional files list -->
   <div class="files-list" id="extraFiles"></div>
 
   <!-- Google Drive URL -->
@@ -458,8 +503,10 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
       <path d="M59.8 52H27.5L13.75 75.8c1.35.8 2.9 1.2 4.45 1.2h50.9c1.55 0 3.1-.4 4.45-1.2L59.8 52z" fill="#666"/>
       <path d="M73.4 26.5l-12.6-21.8C59.95 3.3 58.8 2.2 57.4 1.4L43.65 25 59.8 52h27.45c0-1.55-.4-3.1-1.2-4.5L73.4 26.5z" fill="#888"/>
     </svg>
-    <input class="gdrive-input" id="gdriveUrl" type="url" placeholder="Paste Google Drive share link (optional)"/>
-    <button class="gdrive-btn" id="gdriveCheck">Import</button>
+    <input class="gdrive-input" id="gdriveUrl" type="url"
+      inputmode="url" autocomplete="off" spellcheck="false"
+      placeholder="Paste Google Drive share link (optional)"/>
+    <button class="gdrive-btn" id="gdriveCheck" type="button">Import</button>
   </div>
 
   <!-- Settings -->
@@ -472,10 +519,10 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
         AI Model
       </div>
       <select id="modelSel">
-        <option value="tiny">Tiny — Fastest (39M)</option>
-        <option value="base" selected>Base — Balanced (74M)</option>
-        <option value="small">Small — Better (244M)</option>
-        <option value="medium">Medium — Best (769M)</option>
+        <option value="tiny">Tiny — Fastest (39M params)</option>
+        <option value="base" selected>Base — Balanced (74M params)</option>
+        <option value="small">Small — Better (244M params)</option>
+        <option value="medium">Medium — Best Accuracy (769M)</option>
       </select>
       <div class="sg-tags">
         <span class="sg-tag green">tiny: ~32× realtime</span>
@@ -503,12 +550,12 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
         <option value="pt">Portuguese</option>
       </select>
       <div class="sg-tags">
-        <span class="sg-tag">Output always: EN + HI</span>
+        <span class="sg-tag">Output: EN + HI + Hinglish</span>
       </div>
     </div>
   </div>
 
-  <button class="btn-primary" id="transcribeBtn" disabled>
+  <button class="btn-primary" id="transcribeBtn" disabled type="button">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
       <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
@@ -519,7 +566,7 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
   </button>
 </div>
 
-<!-- ── QUEUE VIEW (multi-job) ── -->
+<!-- ── QUEUE (multi-job) ── -->
 <div class="card queue-card" id="queueCard">
   <div class="queue-title">Processing Queue</div>
   <div id="jobsList"></div>
@@ -535,7 +582,7 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
     </div>
   </div>
   <div class="steps">
-    <div class="step" id="st1"><div class="step-dot">1</div><div class="step-lbl">Load Model</div></div>
+    <div class="step" id="st1"><div class="step-dot">1</div><div class="step-lbl">Load</div></div>
     <div class="step" id="st2"><div class="step-dot">2</div><div class="step-lbl">Extract</div></div>
     <div class="step" id="st3"><div class="step-dot">3</div><div class="step-lbl">Transcribe</div></div>
     <div class="step" id="st4"><div class="step-dot">4</div><div class="step-lbl">Translate</div></div>
@@ -555,7 +602,7 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
   <div>
     <div class="err-title">Processing Failed</div>
     <div class="err-msg" id="errMsg"></div>
-    <button class="btn-retry" onclick="resetApp()">Try Again</button>
+    <button class="btn-retry" onclick="resetApp()" type="button">Try Again</button>
   </div>
 </div>
 
@@ -570,7 +617,7 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
     </div>
     <div>
       <div class="res-title">Transcription Complete</div>
-      <div class="res-sub" id="resLang">Language detected and translated to Hindi</div>
+      <div class="res-sub" id="resLang">Language detected and translated</div>
     </div>
   </div>
 
@@ -592,6 +639,11 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
       <div class="dl-info"><div class="dl-name">Hindi Subtitles</div><div class="dl-desc">SRT · हिंदी अनुवाद</div></div>
       <svg class="dl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
+    <a class="dl-btn" href="#" onclick="return dlFile('hinglish_srt')">
+      <div class="dl-badge hl-badge">SRT</div>
+      <div class="dl-info"><div class="dl-name">Hinglish Subtitles</div><div class="dl-desc">SRT · Hindi in Roman script</div></div>
+      <svg class="dl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
     <a class="dl-btn" href="#" onclick="return dlFile('bilingual_srt')">
       <div class="dl-badge bi-badge">SRT</div>
       <div class="dl-info"><div class="dl-name">Bilingual Subtitles</div><div class="dl-desc">SRT · EN + HI together</div></div>
@@ -607,14 +659,14 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
       <div class="dl-info"><div class="dl-name">Hindi WebVTT</div><div class="dl-desc">VTT · Web video players</div></div>
       <svg class="dl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
-    <a class="dl-btn" href="#" onclick="return dlFile('hinglish_srt')">
-      <div class="dl-badge" style="background:rgba(100,220,140,.1);color:#55dd88;width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10.5px;font-weight:800;letter-spacing:.2px">SRT</div>
-      <div class="dl-info"><div class="dl-name">Hinglish Subtitles</div><div class="dl-desc">SRT · Hindi in Roman script</div></div>
-      <svg class="dl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </a>
     <a class="dl-btn" href="#" onclick="return dlFile('transcript_en')">
       <div class="dl-badge txt-badge">TXT</div>
-      <div class="dl-info"><div class="dl-name">Plain Transcript</div><div class="dl-desc">TXT · English text only</div></div>
+      <div class="dl-info"><div class="dl-name">English Transcript</div><div class="dl-desc">TXT · Plain text</div></div>
+      <svg class="dl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+    <a class="dl-btn" href="#" onclick="return dlFile('transcript_hi')">
+      <div class="dl-badge hi-badge">TXT</div>
+      <div class="dl-info"><div class="dl-name">Hindi Transcript</div><div class="dl-desc">TXT · हिंदी पाठ</div></div>
       <svg class="dl-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
   </div>
@@ -622,10 +674,10 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
   <div class="sec-title">Preview</div>
   <div class="preview-box">
     <div class="tabs">
-      <button class="tab active" data-tab="bi">Bilingual</button>
-      <button class="tab" data-tab="en">English</button>
-      <button class="tab" data-tab="hi">Hindi</button>
-      <button class="tab" data-tab="hl">Hinglish</button>
+      <button class="tab active" data-tab="bi" type="button">Bilingual</button>
+      <button class="tab" data-tab="en" type="button">English</button>
+      <button class="tab" data-tab="hi" type="button">Hindi</button>
+      <button class="tab" data-tab="hl" type="button">Hinglish</button>
     </div>
     <div class="tab-pane active" id="tp-bi"><div class="seg-list" id="sl-bi"></div></div>
     <div class="tab-pane" id="tp-en"><div class="seg-list" id="sl-en"></div></div>
@@ -633,7 +685,7 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
     <div class="tab-pane" id="tp-hl"><div class="seg-list" id="sl-hl"></div></div>
   </div>
 
-  <button class="btn-new" onclick="resetApp()">
+  <button class="btn-new" onclick="resetApp()" type="button">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
     </svg>
@@ -652,7 +704,7 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
       </svg>
     </div>
     <div class="feat-title">Whisper AI Engine</div>
-    <div class="feat-desc">OpenAI's state-of-the-art speech model. Works on 90+ languages with near-human accuracy.</div>
+    <div class="feat-desc">OpenAI's state-of-the-art speech model. 4 model sizes for any speed/accuracy need.</div>
   </div>
   <div class="feat">
     <div class="feat-icon">
@@ -661,8 +713,8 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
       </svg>
     </div>
-    <div class="feat-title">EN + HI Always</div>
-    <div class="feat-desc">Every job outputs English and Hindi. Bilingual SRT puts both languages on screen simultaneously.</div>
+    <div class="feat-title">EN + HI + Hinglish</div>
+    <div class="feat-desc">Every job outputs English, Hindi, and Instagram-style Hinglish captions automatically.</div>
   </div>
   <div class="feat">
     <div class="feat-icon">
@@ -671,7 +723,7 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
       </svg>
     </div>
     <div class="feat-title">Multi-Video Queue</div>
-    <div class="feat-desc">Upload several videos at once. Each processes independently with real-time progress tracking.</div>
+    <div class="feat-desc">Upload several videos at once. Each processes independently with real-time progress.</div>
   </div>
 </div>
 
@@ -680,70 +732,75 @@ footer{border-top:1px solid var(--border);padding:28px 0;text-align:center;color
 </div><!-- /wrap -->
 
 <script>
-// ── State ──────────────────────────────────────────────────────────────────
-let files = [];          // selected File objects
-let activeJobId = null;  // current single-mode job
-let activeJobs = {};     // jobId -> { name, es, data }
+// ── State ──────────────────────────────────────────────────────────────────────
+let files = [];
+let activeJobId = null;
+let activeJobs = {};
 let multiMode = false;
+let _pollTimer = null;
 const stepIds = ['st1','st2','st3','st4','st5'];
 
-// ── DOM refs ───────────────────────────────────────────────────────────────
-const dz       = document.getElementById('dz');
-const fi       = document.getElementById('fi');
-const dzEmpty  = document.getElementById('dzEmpty');
-const dzFilled = document.getElementById('dzFilled');
-const fn1 = document.getElementById('fn1');
-const fm1 = document.getElementById('fm1');
+// ── DOM refs ───────────────────────────────────────────────────────────────────
+const dz        = document.getElementById('dz');
+const fi        = document.getElementById('fi');
+const browseBtn = document.getElementById('browseBtn');
+const dzEmpty   = document.getElementById('dzEmpty');
+const dzFilled  = document.getElementById('dzFilled');
+const fn1       = document.getElementById('fn1');
+const fm1       = document.getElementById('fm1');
 const extraFiles = document.getElementById('extraFiles');
 const gdriveUrl  = document.getElementById('gdriveUrl');
 const gdriveBtn  = document.getElementById('gdriveCheck');
-const tBtn  = document.getElementById('transcribeBtn');
+const tBtn       = document.getElementById('transcribeBtn');
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────────────────────────
 function fmtSize(b){
-  if(b<1024)return b+' B';
-  if(b<1048576)return(b/1024).toFixed(1)+' KB';
-  if(b<1073741824)return(b/1048576).toFixed(1)+' MB';
-  return(b/1073741824).toFixed(1)+' GB';
+  if(b<1024) return b+' B';
+  if(b<1048576) return (b/1024).toFixed(1)+' KB';
+  if(b<1073741824) return (b/1048576).toFixed(1)+' MB';
+  return (b/1073741824).toFixed(1)+' GB';
 }
 function fmtDur(s){
-  if(!s)return'—';
-  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=Math.floor(s%60);
-  if(h>0)return`${h}h ${m}m`;
-  if(m>0)return`${m}m ${sc}s`;
-  return`${sc}s`;
+  if(!s) return '—';
+  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60), sc=Math.floor(s%60);
+  if(h>0) return `${h}h ${m}m`;
+  if(m>0) return `${m}m ${sc}s`;
+  return `${sc}s`;
 }
 function fmtTs(s){
-  const m=Math.floor(s/60),sc=Math.floor(s%60);
-  return`${m}:${String(sc).padStart(2,'0')}`;
+  const m=Math.floor(s/60), sc=Math.floor(s%60);
+  return `${m}:${String(sc).padStart(2,'0')}`;
 }
 function esc(str){
-  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(str||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 function checkEnabled(){
   tBtn.disabled = !(files.length > 0 || gdriveUrl.value.trim().length > 6);
 }
 
-// ── File picking ───────────────────────────────────────────────────────────
+// ── File picking ───────────────────────────────────────────────────────────────
 function setFiles(newFiles){
   files = Array.from(newFiles);
   if(!files.length){ clearFiles(); return; }
   fn1.textContent = files[0].name;
-  fm1.textContent = fmtSize(files[0].size) + ' · ' + (files[0].type||'video');
+  fm1.textContent = fmtSize(files[0].size) + (files[0].type ? ' · ' + files[0].type : '');
   dzEmpty.style.display = 'none';
   dzFilled.style.display = 'block';
   dz.classList.add('filled');
   extraFiles.innerHTML = '';
   if(files.length > 1){
-    files.slice(1).forEach(f=>{
-      extraFiles.innerHTML += `
-        <div class="files-list-item">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
-          </svg>
-          <span style="font-size:13px;color:#ccc;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.name)}</span>
-          <span class="badge">${fmtSize(f.size)}</span>
-        </div>`;
+    files.slice(1).forEach(f => {
+      const item = document.createElement('div');
+      item.className = 'files-list-item';
+      item.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+        </svg>
+        <span style="font-size:13px;color:#ccc;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.name)}</span>
+        <span class="badge">${fmtSize(f.size)}</span>`;
+      extraFiles.appendChild(item);
     });
   }
   checkEnabled();
@@ -759,32 +816,43 @@ function clearFiles(){
   checkEnabled();
 }
 
+// File input change
 fi.addEventListener('change', e => setFiles(e.target.files));
 
+// Browse button — reliable on iOS
+browseBtn.addEventListener('click', e => { e.stopPropagation(); fi.click(); });
+
+// Remove file button
 document.getElementById('removeFile1').addEventListener('click', e => {
-  e.stopPropagation(); clearFiles();
+  e.stopPropagation();
+  clearFiles();
 });
 
+// Dropzone click (excluding button and remove)
 dz.addEventListener('click', e => {
-  if(e.target.closest('#removeFile1') || e.target.closest('strong[onclick]')) return;
+  if(e.target === browseBtn || e.target.closest('#browseBtn') ||
+     e.target.closest('#removeFile1')) return;
   fi.click();
 });
+
+// Drag and drop (desktop)
 dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('dragleave', e => { if(!dz.contains(e.relatedTarget)) dz.classList.remove('over'); });
 dz.addEventListener('drop', e => {
-  e.preventDefault(); dz.classList.remove('over');
+  e.preventDefault();
+  dz.classList.remove('over');
   if(e.dataTransfer.files.length) setFiles(e.dataTransfer.files);
 });
 
+// GDrive
 gdriveUrl.addEventListener('input', checkEnabled);
-
 gdriveBtn.addEventListener('click', () => {
   const url = gdriveUrl.value.trim();
   if(!url){ alert('Please paste a Google Drive share link first.'); return; }
-  tBtn.disabled = false;
+  checkEnabled();
 });
 
-// ── Transcribe ─────────────────────────────────────────────────────────────
+// ── Transcribe ─────────────────────────────────────────────────────────────────
 tBtn.addEventListener('click', startTranscription);
 
 async function startTranscription(){
@@ -792,7 +860,6 @@ async function startTranscription(){
   const lang  = document.getElementById('langSel').value;
   const gdUrl = gdriveUrl.value.trim();
 
-  // Decide: multi-file, single file, or gdrive
   if(files.length > 1){
     await startMulti(files, model, lang);
   } else if(files.length === 1 || gdUrl){
@@ -800,7 +867,7 @@ async function startTranscription(){
   }
 }
 
-// ── Single job ─────────────────────────────────────────────────────────────
+// ── Single job ─────────────────────────────────────────────────────────────────
 async function startSingle(file, gdUrl, model, lang){
   document.getElementById('uploadCard').style.display = 'none';
   document.getElementById('progressCard').classList.add('visible','fade-up');
@@ -818,57 +885,117 @@ async function startSingle(file, gdUrl, model, lang){
     res = await fetch('/upload', {method:'POST', body:fd});
     data = await res.json();
   } catch(e){
-    showErr('Network error: ' + e.message); return;
+    showErr('Network error: ' + e.message);
+    return;
   }
-  if(!res.ok || data.error){ showErr(data.error||'Upload failed'); return; }
+  if(!res.ok || data.error){ showErr(data.error || 'Upload failed'); return; }
 
   activeJobId = data.job_id;
-  listenSingle(data.job_id);
+  listenProgress(data.job_id,
+    d => { updateProgUI(d); },
+    d => { loadResults(data.job_id, d); },
+    msg => { showErr(msg); }
+  );
 }
 
-function listenSingle(jobId){
-  const es = new EventSource(`/progress/${jobId}`);
-  es.onmessage = e => {
-    const d = JSON.parse(e.data);
-    updateProgUI(d);
-    if(d.status==='done'){ es.close(); loadResults(jobId, d); }
-    else if(d.status==='error'){ es.close(); showErr(d.message); }
-  };
-  es.onerror = () => { es.close(); showErr('Connection error.'); };
+// ── Progress listener — SSE with polling fallback ──────────────────────────────
+function listenProgress(jobId, onUpdate, onDone, onError){
+  let es = null;
+  let retries = 0;
+  const MAX_SSE_RETRIES = 5;
+
+  function connectSSE(){
+    if(es){ try{ es.close(); } catch(e){} }
+    es = new EventSource(`/progress/${jobId}`);
+
+    es.onmessage = ev => {
+      retries = 0;
+      let d;
+      try{ d = JSON.parse(ev.data); } catch(e){ return; }
+      onUpdate(d);
+      if(d.status === 'done'){   es.close(); onDone(d); }
+      else if(d.status === 'error'){ es.close(); onError(d.message || 'Processing failed.'); }
+    };
+
+    es.onerror = () => {
+      es.close();
+      retries++;
+      if(retries <= MAX_SSE_RETRIES){
+        // Retry SSE with backoff
+        setTimeout(connectSSE, Math.min(2000 * retries, 10000));
+      } else {
+        // SSE repeatedly failed — fall back to polling
+        startPolling(jobId, onUpdate, onDone, onError);
+      }
+    };
+  }
+
+  // Check if EventSource is supported (all modern browsers incl. iOS Safari 6+)
+  if(typeof EventSource !== 'undefined'){
+    connectSSE();
+  } else {
+    startPolling(jobId, onUpdate, onDone, onError);
+  }
 }
 
+function startPolling(jobId, onUpdate, onDone, onError){
+  if(_pollTimer) clearInterval(_pollTimer);
+  _pollTimer = setInterval(async () => {
+    try{
+      const r = await fetch(`/progress_json/${jobId}`);
+      const d = await r.json();
+      onUpdate(d);
+      if(d.status === 'done'){
+        clearInterval(_pollTimer); _pollTimer = null;
+        onDone(d);
+      } else if(d.status === 'error'){
+        clearInterval(_pollTimer); _pollTimer = null;
+        onError(d.message || 'Processing failed.');
+      }
+    } catch(e){
+      // Ignore transient network errors during polling
+    }
+  }, 2000);
+}
+
+// ── Progress UI ────────────────────────────────────────────────────────────────
 const stepStatus = {
   queued:0, downloading:1, loading_model:1,
   extracting_audio:2, transcribing:3, translating:4, generating:5, done:5
 };
 
 function updateProgUI(d){
-  document.getElementById('progFill').style.width = d.progress+'%';
-  document.getElementById('progPct').textContent   = d.progress+'%';
-  document.getElementById('progMsg').textContent   = d.message||'';
-  const cur = stepStatus[d.status]||0;
-  stepIds.forEach((id,i)=>{
-    const el=document.getElementById(id);
+  const pct = Math.max(0, Math.min(100, d.progress || 0));
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progPct').textContent  = pct + '%';
+  document.getElementById('progMsg').textContent  = d.message || '';
+  const cur = stepStatus[d.status] || 0;
+  stepIds.forEach((id,i) => {
+    const el = document.getElementById(id);
     el.classList.remove('active','done');
     if(i+1 < cur) el.classList.add('done');
     else if(i+1 === cur) el.classList.add('active');
   });
-  if(d.status==='done') document.getElementById('progSpinner').style.display='none';
+  if(d.status === 'done') document.getElementById('progSpinner').style.display = 'none';
 }
 
+// ── Results ────────────────────────────────────────────────────────────────────
 async function loadResults(jobId, summary){
   document.getElementById('progressCard').classList.remove('visible');
   document.getElementById('resultsCard').classList.add('visible','fade-up');
   activeJobId = jobId;
 
-  document.getElementById('sSeg').textContent   = summary.segment_count||'—';
-  document.getElementById('sWords').textContent = summary.word_count||'—';
+  document.getElementById('sSeg').textContent   = summary.segment_count || '—';
+  document.getElementById('sWords').textContent = summary.word_count || '—';
   document.getElementById('sDur').textContent   = fmtDur(summary.duration);
+
+  const lang = (summary.detected_language || '?').toUpperCase();
   document.getElementById('resLang').textContent =
-    `Detected: ${(summary.detected_language||'?').toUpperCase()} · Translated to Hindi`;
+    `Detected: ${lang} · Outputs: English + Hindi + Hinglish`;
 
   try{
     const r = await fetch(`/segments/${jobId}`);
+    if(!r.ok) throw new Error('segments not ready');
     const segs = await r.json();
     renderSegs(segs);
   } catch(e){}
@@ -881,20 +1008,20 @@ function renderSegs(segs){
   const hl = document.getElementById('sl-hl');
   bi.innerHTML = en.innerHTML = hi.innerHTML = hl.innerHTML = '';
 
-  segs.forEach(s=>{
+  segs.forEach(s => {
     const ts  = fmtTs(s.start);
-    const e   = esc(s.text_en||s.text||'');
-    const h   = esc(s.text_hi||'');
-    const hgl = esc(s.text_hinglish||'');
+    const e   = esc(s.text_en || s.text || '');
+    const h   = esc(s.text_hi || '');
+    const hgl = esc(s.text_hinglish || '');
 
-    bi.innerHTML += `<div class="seg"><span class="seg-ts">${ts}</span><div class="seg-body"><div class="seg-en">${e}</div>${h?`<div class="seg-hi">${h}</div>`:''}</div></div>`;
+    bi.innerHTML += `<div class="seg"><span class="seg-ts">${ts}</span><div class="seg-body"><div class="seg-en">${e}</div>${h ? `<div class="seg-hi">${h}</div>` : ''}</div></div>`;
     en.innerHTML += `<div class="seg"><span class="seg-ts">${ts}</span><div class="seg-body"><div class="seg-en">${e}</div></div></div>`;
     if(h)   hi.innerHTML += `<div class="seg"><span class="seg-ts">${ts}</span><div class="seg-body"><div class="seg-en">${h}</div></div></div>`;
     if(hgl) hl.innerHTML += `<div class="seg"><span class="seg-ts">${ts}</span><div class="seg-body"><div class="seg-en" style="color:#55dd88">${hgl}</div></div></div>`;
   });
 }
 
-// ── Multi job ──────────────────────────────────────────────────────────────
+// ── Multi job ──────────────────────────────────────────────────────────────────
 async function startMulti(fileList, model, lang){
   multiMode = true;
   document.getElementById('uploadCard').style.display = 'none';
@@ -910,113 +1037,149 @@ async function startMulti(fileList, model, lang){
   try{
     res = await fetch('/upload_multiple', {method:'POST', body:fd});
     data = await res.json();
-  } catch(e){ showErr('Network error: '+e.message); return; }
-  if(!res.ok||data.error){ showErr(data.error||'Upload failed'); return; }
+  } catch(e){ showErr('Network error: ' + e.message); return; }
+  if(!res.ok || data.error){ showErr(data.error || 'Upload failed'); return; }
 
   data.jobs.forEach(j => addJobToQueue(j.job_id, j.name));
 }
 
 function addJobToQueue(jobId, name){
   const jl = document.getElementById('jobsList');
-  jl.innerHTML += `
-    <div class="job-item" id="ji-${jobId}">
-      <div class="job-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
-        </svg>
+  const div = document.createElement('div');
+  div.className = 'job-item';
+  div.id = `ji-${jobId}`;
+  div.innerHTML = `
+    <div class="job-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+      </svg>
+    </div>
+    <div class="job-info" style="flex:1;min-width:0">
+      <div class="job-name">${esc(name)}</div>
+      <div class="job-status" id="js-${jobId}">Queued…</div>
+      <div class="job-bar-wrap">
+        <div class="job-bar-track"><div class="job-bar-fill" id="jb-${jobId}" style="width:0%"></div></div>
+        <div class="job-pct" id="jp-${jobId}">0%</div>
       </div>
-      <div class="job-info" style="flex:1;min-width:0">
-        <div class="job-name">${esc(name)}</div>
-        <div class="job-status" id="js-${jobId}">Queued…</div>
-        <div class="job-bar-wrap">
-          <div class="job-bar-track"><div class="job-bar-fill" id="jb-${jobId}" style="width:0%"></div></div>
-          <div class="job-pct" id="jp-${jobId}">0%</div>
-        </div>
-        <div class="job-dl" id="jdl-${jobId}" style="display:none"></div>
-      </div>
-      <div class="job-actions">
-        <button class="job-view-btn" id="jvb-${jobId}" style="display:none" onclick="viewJob('${jobId}')">View</button>
-      </div>
+      <div class="job-dl" id="jdl-${jobId}" style="display:none"></div>
+    </div>
+    <div class="job-actions">
+      <button class="job-view-btn" id="jvb-${jobId}" style="display:none"
+        onclick="viewJob('${jobId}')" type="button">View</button>
     </div>`;
+  jl.appendChild(div);
 
-  const es = new EventSource(`/progress/${jobId}`);
-  activeJobs[jobId] = {name, es};
-
-  es.onmessage = ev => {
-    const d = JSON.parse(ev.data);
-    const bar = document.getElementById(`jb-${jobId}`);
-    const pct = document.getElementById(`jp-${jobId}`);
-    const stat = document.getElementById(`js-${jobId}`);
-    const ji = document.getElementById(`ji-${jobId}`);
-    if(bar) bar.style.width = d.progress+'%';
-    if(pct) pct.textContent = d.progress+'%';
-    if(stat) stat.textContent = d.message||'';
-
-    if(d.status==='done'){
-      es.close();
-      ji.classList.add('done');
-      activeJobs[jobId].data = d;
-      // Show download links
+  listenProgress(
+    jobId,
+    d => {
+      const bar  = document.getElementById(`jb-${jobId}`);
+      const pct  = document.getElementById(`jp-${jobId}`);
+      const stat = document.getElementById(`js-${jobId}`);
+      const ji   = document.getElementById(`ji-${jobId}`);
+      if(bar)  bar.style.width = (d.progress||0) + '%';
+      if(pct)  pct.textContent = (d.progress||0) + '%';
+      if(stat) stat.textContent = d.message || '';
+      if(d.status === 'error' && ji) ji.classList.add('error');
+    },
+    d => {
+      const ji  = document.getElementById(`ji-${jobId}`);
       const jdl = document.getElementById(`jdl-${jobId}`);
+      const vb  = document.getElementById(`jvb-${jobId}`);
+      if(ji)  ji.classList.add('done');
+      if(activeJobs[jobId]) activeJobs[jobId].data = d;
       if(jdl){
-        jdl.style.display='flex';
+        jdl.style.display = 'flex';
         jdl.innerHTML = `
-          <a href="/download/${jobId}/english_srt">EN.srt</a>
-          <a href="/download/${jobId}/hindi_srt">HI.srt</a>
-          <a href="/download/${jobId}/hinglish_srt">Hinglish.srt</a>
-          <a href="/download/${jobId}/bilingual_srt">Bilingual.srt</a>
-          <a href="/download/${jobId}/english_vtt">EN.vtt</a>
-          <a href="/download/${jobId}/hindi_vtt">HI.vtt</a>
-          <a href="/download/${jobId}/transcript_en">EN.txt</a>`;
+          <a href="/download/${jobId}/english_srt" onclick="return qDl(event,'${jobId}','english_srt')">EN.srt</a>
+          <a href="/download/${jobId}/hindi_srt" onclick="return qDl(event,'${jobId}','hindi_srt')">HI.srt</a>
+          <a href="/download/${jobId}/hinglish_srt" onclick="return qDl(event,'${jobId}','hinglish_srt')">Hinglish.srt</a>
+          <a href="/download/${jobId}/bilingual_srt" onclick="return qDl(event,'${jobId}','bilingual_srt')">Bilingual.srt</a>
+          <a href="/download/${jobId}/english_vtt" onclick="return qDl(event,'${jobId}','english_vtt')">EN.vtt</a>
+          <a href="/download/${jobId}/transcript_en" onclick="return qDl(event,'${jobId}','transcript_en')">EN.txt</a>`;
       }
-      const vb = document.getElementById(`jvb-${jobId}`);
-      if(vb) vb.style.display='block';
-    } else if(d.status==='error'){
-      es.close();
-      ji.classList.add('error');
-      const stat2 = document.getElementById(`js-${jobId}`);
-      if(stat2) stat2.style.color='var(--danger)';
+      if(vb) vb.style.display = 'block';
+    },
+    msg => {
+      const ji   = document.getElementById(`ji-${jobId}`);
+      const stat = document.getElementById(`js-${jobId}`);
+      if(ji)   ji.classList.add('error');
+      if(stat){ stat.textContent = msg; stat.style.color = 'var(--danger)'; }
     }
-  };
-  es.onerror = () => es.close();
+  );
+
+  activeJobs[jobId] = {name};
 }
 
 function viewJob(jobId){
-  // Switch to results view for this job
   document.getElementById('queueCard').classList.remove('visible');
   document.getElementById('resultsCard').classList.add('visible','fade-up');
   activeJobId = jobId;
   const d = activeJobs[jobId]?.data;
   if(d){
-    document.getElementById('sSeg').textContent   = d.segment_count||'—';
-    document.getElementById('sWords').textContent = d.word_count||'—';
+    document.getElementById('sSeg').textContent   = d.segment_count || '—';
+    document.getElementById('sWords').textContent = d.word_count || '—';
     document.getElementById('sDur').textContent   = fmtDur(d.duration);
-    document.getElementById('resLang').textContent = `Detected: ${(d.detected_language||'?').toUpperCase()} · Translated to Hindi`;
+    const lang = (d.detected_language || '?').toUpperCase();
+    document.getElementById('resLang').textContent =
+      `Detected: ${lang} · Outputs: English + Hindi + Hinglish`;
   }
   fetch(`/segments/${jobId}`)
-    .then(r=>r.json())
-    .then(segs=>renderSegs(segs))
-    .catch(()=>{});
+    .then(r => r.json())
+    .then(segs => renderSegs(segs))
+    .catch(() => {});
 }
 
-// ── Download ───────────────────────────────────────────────────────────────
-function dlFile(fmt){
-  if(!activeJobId) return false;
-  window.location.href = `/download/${activeJobId}/${fmt}`;
+// Queue item download helper
+function qDl(e, jobId, fmt){
+  e.preventDefault();
+  downloadFile(`/download/${jobId}/${fmt}`, fmt);
   return false;
 }
 
-// ── Error ──────────────────────────────────────────────────────────────────
+// ── Download — works on iOS Safari, Android, Windows, Mac ─────────────────────
+async function dlFile(fmt){
+  if(!activeJobId) return false;
+  downloadFile(`/download/${activeJobId}/${fmt}`, fmt);
+  return false;
+}
+
+async function downloadFile(url, fmt){
+  try{
+    const resp = await fetch(url);
+    if(!resp.ok) throw new Error('Download failed');
+    const blob = await resp.blob();
+    const objUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objUrl;
+    // Determine download filename
+    const cd = resp.headers.get('content-disposition') || '';
+    const match = cd.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+    a.download = match ? match[1].replace(/['"]/g, '') : (fmt + '.srt');
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objUrl);
+    }, 150);
+  } catch(e){
+    // Fallback: open in new tab (works on all devices)
+    window.open(url, '_blank');
+  }
+}
+
+// ── Error ──────────────────────────────────────────────────────────────────────
 function showErr(msg){
+  if(_pollTimer){ clearInterval(_pollTimer); _pollTimer = null; }
   document.getElementById('progressCard').classList.remove('visible');
   document.getElementById('uploadCard').style.display = 'block';
   document.getElementById('errCard').classList.add('visible','fade-up');
   document.getElementById('errMsg').textContent = msg;
 }
 
-// ── Reset ──────────────────────────────────────────────────────────────────
+// ── Reset ──────────────────────────────────────────────────────────────────────
 function resetApp(){
-  Object.values(activeJobs).forEach(j=>{ try{ j.es.close(); } catch(e){} });
+  if(_pollTimer){ clearInterval(_pollTimer); _pollTimer = null; }
   activeJobs = {};
   activeJobId = null;
   multiMode = false;
@@ -1030,16 +1193,17 @@ function resetApp(){
   document.getElementById('jobsList').innerHTML = '';
   document.getElementById('progFill').style.width = '0%';
   document.getElementById('progPct').textContent = '0%';
+  document.getElementById('progMsg').textContent = 'Initializing…';
   document.getElementById('progSpinner').style.display = '';
-  stepIds.forEach(id=>document.getElementById(id).classList.remove('active','done'));
+  stepIds.forEach(id => document.getElementById(id).classList.remove('active','done'));
 }
 
-// ── Tabs ───────────────────────────────────────────────────────────────────
-document.querySelectorAll('.tab').forEach(t=>{
-  t.addEventListener('click',()=>{
+// ── Tabs ───────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
     const name = t.dataset.tab;
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
     document.getElementById(`tp-${name}`).classList.add('active');
   });

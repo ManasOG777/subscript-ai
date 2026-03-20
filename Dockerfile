@@ -24,6 +24,6 @@ EXPOSE $PORT
 CMD gunicorn app:app \
     --bind 0.0.0.0:${PORT:-8080} \
     --timeout 600 \
-    --workers 2 \
-    --threads 4 \
+    --workers 1 \
+    --threads 8 \
     --worker-class gthread
