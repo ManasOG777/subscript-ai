@@ -1,0 +1,15 @@
+uploads/
+outputs/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.aiff
+*.wav
+test_english.mp4
+test_hindi.mp4
+SubScript_Demo.mp4
+.DS_Store
+*.egg-info/
+dist/
+build/

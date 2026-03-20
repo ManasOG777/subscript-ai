@@ -1,0 +1,7 @@
+flask>=3.0.0
+faster-whisper>=1.2.0
+deep-translator>=1.11.0
+requests>=2.31.0
+gdown>=5.0.0
+indic-transliteration>=2.3.0
+gunicorn>=21.2.0
