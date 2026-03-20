@@ -19,11 +19,11 @@ COPY templates/ templates/
 # Create runtime dirs
 RUN mkdir -p uploads outputs
 
-EXPOSE 8080
+EXPOSE $PORT
 
-CMD ["gunicorn", "app:app", \
-     "--bind", "0.0.0.0:8080", \
-     "--timeout", "600", \
-     "--workers", "2", \
-     "--threads", "4", \
-     "--worker-class", "gthread"]
+CMD gunicorn app:app \
+    --bind 0.0.0.0:${PORT:-8080} \
+    --timeout 600 \
+    --workers 2 \
+    --threads 4 \
+    --worker-class gthread
