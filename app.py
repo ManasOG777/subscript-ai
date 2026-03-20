@@ -794,5 +794,28 @@ def download(job_id, fmt):
     )
 
 
+def _predownload_models():
+    """
+    Background thread that downloads all Whisper model files to disk cache at
+    container startup. Models are loaded from disk when a user request arrives —
+    much faster than downloading from HuggingFace on demand (5-7 min cold start).
+    Each model is instantiated then immediately freed from memory; only the
+    ~/.cache/huggingface disk cache is kept.
+    """
+    for size in ['tiny', 'base', 'small', 'medium']:
+        try:
+            m = WhisperModel(
+                size, device='cpu', compute_type='int8',
+                cpu_threads=1, num_workers=1,
+            )
+            del m   # free RAM, HuggingFace disk cache remains
+        except Exception:
+            pass    # non-fatal — model will download on first user request
+
+
+# Kick off pre-download immediately when the worker process starts
+threading.Thread(target=_predownload_models, daemon=True).start()
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5050, host='0.0.0.0', threaded=True)
